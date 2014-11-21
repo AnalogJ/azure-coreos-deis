@@ -66,12 +66,106 @@ This will fetch a discovery URL that looks something like https://discovery.etcd
     --vm-name=coreos2 \
     --virtual-network-name=myapp-network \
     --affinity-group=myapp-affinity \
+    --connect
     myapp-cloud-service-name \
     2b171e93f07c4903bcad35bda10acf22__CoreOS-Beta-494.0.0 \
     core
+
+Let's quickly ssh into the first machine in the cluster and check to make sure everything looks ok:
+
+    ssh core@myapp-cloud-service-name.cloudapp.net -p 22 -i ../path/to/cert
+
+Let's first make sure etcd is up and running:
+
+    sudo etcdctl ls --recursive
+    # /coreos.com
+    # /coreos.com/updateengine
+    # /coreos.com/updateengine/rebootlock
+    # /coreos.com/updateengine/rebootlock/semaphore
+
+And that fleetctl knows about all of the members of the cluster:
+
+    sudo fleetctl list-machines
+    # MACHINE     IP      METADATA
+    # 36a636af... 10.0.0.4    region=us-east
+    # 40078616... 10.0.0.5    region=us-east
+    # f6ebd7d1... 10.0.2.4    region=us-east
+
+Finally lets exit from the CoreOS cluster and install the local management tools
+
+    exit
+
+##Install Deis Control Utility
+The Deis Control Utility, or `deisctl` for short, is a command-line client used to configure and manage the Deis Platform.
+
+###Building from Installer
+
+To install the latest version of deisctl, change to the directory where you would like to install the binary. Then, install the Deis Control Utility by downloading and running the install script with the following command:
+
+    mkdir /tmp/deisctl
+    cd /tmp/deisctl
+    curl -sSL http://deis.io/deisctl/install.sh | sh -s 1.0.1
+
+This installs deisctl to the current directory, and refreshes the Deis systemd unit files used to schedule the components. Link it to /usr/local/bin, so it will be in your PATH:
+
+    cp /tmp/deisctl/deisctl /usr/local/bin/deisctl
+
+Always use a version of deisctl that matches the Deis release. Verify this with `deisctl --version`.
+
+##Install the Deis Platform
+
+Ensure your SSH agent is running and select the private key that corresponds to the SSH key added to your CoreOS nodes:
+
+    eval `ssh-agent -s`
+    ssh-add ~/.ssh/deis
+
+Export it to the DEISCTL_TUNNEL environment variable (substituting your own cloud app service name):
+
+    export DEISCTL_TUNNEL="myapp-cloud-service-name.cloudapp.net"
+
+This is the IP address where deisctl will attempt to communicate with the cluster. You can test that it is working properly by running deisctl list. If you see a single line of output, the control utility is communicating with the nodes.
+
+Before provisioning the platform, we’ll need to add the SSH key to Deis so it can connect to remote hosts during deis run:
+
+    deisctl config platform set sshPrivateKey=~/.ssh/deis
+
+We’ll also need to tell the controller which domain name we are deploying applications under:
+
+    deisctl config platform set domain=example.com
+
+Once finished, run this command to provision the Deis platform:
+
+    deisctl install platform
+
+You will see output like the following, which indicates that the units required to run Deis have been loaded on the CoreOS cluster:
+
+    ● ▴ ■
+    ■ ● ▴ Installing Deis...
+    ▴ ■ ●
+
+    Scheduling data containers...
+    ...
+    Deis installed.
+    Please run `deisctl start platform` to boot up Deis.
+
+Run this command to start the Deis platform:
+
+    deisctl start platform
+
+Once you see “Deis started.”, your Deis platform is running on a cluster! You may verify that all of the Deis units are loaded and active by running the following command:
+
+    deisctl list
+
+All of the units should be active.
+
+Now that you’ve finished provisioning a cluster, we can get started using the platform.
+
+
 
 ##References
 http://azure.microsoft.com/en-us/documentation/articles/xplat-cli/
 https://coreos.com/docs/launching-containers/launching/fleet-using-the-client/
 https://coreos.com/docs/running-coreos/cloud-providers/azure/
 https://github.com/timfpark/coreos-azure
+http://docs.deis.io/en/latest/installing_deis/install-deisctl/
+http://docs.deis.io/en/latest/installing_deis/install-platform/
