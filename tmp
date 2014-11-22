@@ -1,0 +1,55 @@
+azure vm create \
+    --custom-data=cloud-config.yml \
+    --vm-size=Basic_A1 \
+    --ssh=22 \
+    --ssh-cert=azure_id_rsa.pem \
+    --no-ssh-password \
+    --vm-name=coreos1 \
+    --virtual-network-name=quietthyme-network \
+    --affinity-group=quietthyme-affinity \
+    quietthyme \
+    2b171e93f07c4903bcad35bda10acf22__CoreOS-Beta-494.0.0 \
+    core
+
+    azure vm create \
+    --custom-data=cloud-config.yml \
+    --vm-size=Basic_A1 \
+    --ssh=2222 \
+    --ssh-cert=azure_id_rsa.pem \
+    --no-ssh-password \
+    --vm-name=coreos2 \
+    --virtual-network-name=quietthyme-network \
+    --affinity-group=quietthyme-affinity \
+    --connect \
+    quietthyme \
+    2b171e93f07c4903bcad35bda10acf22__CoreOS-Beta-494.0.0 \
+    core
+
+
+    azure vm create \
+    --custom-data=cloud-config.yml \
+    --vm-size=Basic_A1 \
+    --ssh=2223 \
+    --ssh-cert=azure_id_rsa.pem \
+    --no-ssh-password \
+    --vm-name=coreos3 \
+    --virtual-network-name=quietthyme-network \
+    --affinity-group=quietthyme-affinity \
+    --connect \
+    quietthyme \
+    2b171e93f07c4903bcad35bda10acf22__CoreOS-Beta-494.0.0 \
+    core
+
+    azure vm create \
+    --custom-data=cloud-config.yml \
+    --vm-size=Basic_A1 \
+    --ssh=2224 \
+    --ssh-cert=azure_id_rsa.pem \
+    --no-ssh-password \
+    --vm-name=coreos4 \
+    --virtual-network-name=quietthyme-network \
+    --affinity-group=quietthyme-affinity \
+    --connect \
+    quietthyme \
+    2b171e93f07c4903bcad35bda10acf22__CoreOS-Beta-494.0.0 \
+    core

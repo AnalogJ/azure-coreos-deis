@@ -44,9 +44,12 @@ This will fetch a discovery URL that looks something like https://discovery.etcd
 
 ##Create Azure CoreOS VM Cluster
 
+Run the folllowing commands to create your Azure VMs. Feel free to configure the size and ports, but be sure to create atleast 3 vms. Deis provisions 3 router services by default, and will hang if only less than 3 servers are present. (https://github.com/deis/deis/issues/2469)
+
+
     azure vm create \
-    --custom-data=cloud-config.yaml \
-    --vm-size=Basic_A2 \
+    --custom-data=cloud-config.yml \
+    --vm-size=Basic_A1 \
     --ssh=22 \
     --ssh-cert=../path/to/cert \
     --no-ssh-password \
@@ -58,8 +61,8 @@ This will fetch a discovery URL that looks something like https://discovery.etcd
     core
 
     azure vm create \
-    --custom-data=cloud-config.yaml \
-    --vm-size=Basic_A2 \
+    --custom-data=cloud-config.yml \
+    --vm-size=Basic_A1 \
     --ssh=2222 \
     --ssh-cert=../path/to/cert \
     --no-ssh-password \
@@ -70,6 +73,27 @@ This will fetch a discovery URL that looks something like https://discovery.etcd
     myapp-cloud-service-name \
     2b171e93f07c4903bcad35bda10acf22__CoreOS-Beta-494.0.0 \
     core
+
+    azure vm create \
+    --custom-data=cloud-config.yml \
+    --vm-size=Basic_A1 \
+    --ssh=2223 \
+    --ssh-cert=../path/to/cert \
+    --no-ssh-password \
+    --vm-name=coreos3 \
+    --virtual-network-name=myapp-network \
+    --affinity-group=myapp-affinity \
+    --connect
+    myapp-cloud-service-name \
+    2b171e93f07c4903bcad35bda10acf22__CoreOS-Beta-494.0.0 \
+    core
+
+
+
+Use the following command to find alternative/newer versions of CoreOS
+
+    azure vm image list | grep  "CoreOS"
+
 
 Let's quickly ssh into the first machine in the cluster and check to make sure everything looks ok:
 
